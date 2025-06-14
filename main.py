@@ -3,6 +3,7 @@ from fastapi.params import Depends
 from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 import database
 
 # 1. 初始化 FastAPI 應用程式
@@ -37,11 +38,9 @@ def test_database_connection(db: Session = Depends(database.get_db)):
     一個簡單的端點，用來測試資料庫連線。
     """
     try:
-        # 執行一個簡單的查詢來驗證連線
-        db.execute('SELECT 1')
+        db.execute(text('SELECT 1'))
         return {"status": "success", "message": "資料庫連線成功！"}
     except Exception as e:
-        # 如果有任何錯誤，拋出 HTTP 異常
         raise HTTPException(status_code=500, detail=f"資料庫連線失敗: {e}")
 
 # Create (建立)
