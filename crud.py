@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 import models
 from sqlalchemy import text
 import schemas
+import security
 
 
 # def get_item(db: Session, item_id: int):
@@ -94,3 +95,14 @@ def delete_item(db: Session, item_id: int):
     result = db.execute(query, {"item_id": item_id}).first()
     db.commit()
     return result
+
+def get_user_by_email(db: Session, email: str):
+    return db.query(models.User).filter(models.User.email == email).first()
+
+def create_user(db: Session, user: schemas.UserCreate):
+    hashed_password = security.get_password_hash(user.password)
+    db_user = models.User(email=user.email, hashed_password=hashed_password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
